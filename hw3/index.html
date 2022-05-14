@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>E0905: Ориентация на устройство</title>
+		<meta charset="utf-8">
+		
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+		<script src="three.min.js"></script>
+        <script src="vax.js"></script>
+		
+	</head>
+	
+	<body>
+		
+		
+
+		<script>
+			
+			vaxInit();
+
+			var cubeGeometry = new THREE.BoxGeometry(50,50,50);
+			var cubeMaterial = new THREE.MeshLambertMaterial({"color" : 'violet'});
+			
+			const sz = 25;
+
+			var cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+
+			// const l = new THREE.AmbientLight( 0x404040 ); // soft white light
+			// scene.add( l );
+
+			var l = new THREE.PointLight();
+			l.position.set( 0, 0, 10 );
+			scene.add(l);
+
+			for(let i = 0; i < 200; i++){
+				var coneGeometry = new THREE.ConeGeometry(2, 5, 32	);
+				var coneMaterial = new THREE.MeshLambertMaterial({"color" : THREE.MathUtils.randInt(0, 0xffffff)});
+
+				var cone = new THREE.Mesh(coneGeometry,coneMaterial);
+
+				var rnd1 = THREE.MathUtils.randInt(-sz/2, sz/2) * 2;
+				var rnd2 = THREE.MathUtils.randInt(-sz/2, sz/2) * 2;
+				var rnd3 = THREE.MathUtils.randInt(-sz/2, sz/2) * 2;
+
+				var idx = i % 3;
+				var sign = i % 2 == 1 ? 1 : -1;
+				cone.position.set(rnd1, rnd2, rnd3);				
+				cone.position.setComponent(idx, (sz -2)* sign);
+
+				cube.add(cone);
+			}
+
+			cube.material.side = THREE.DoubleSide;
+
+			camera.position.set(0,0,0);
+
+			scene.add(cube);
+			camera.add(light);
+			
+			window.addEventListener( "deviceorientation", deviceOrientation, true);
+
+			var alpha = 0;
+			var gamma = 0;
+			var beta = 0;
+
+			function deviceOrientation( event ){
+				alpha = event.alpha;
+				gamma = event.gamma;
+				beta = event.beta;
+				
+				gamma += 90;
+
+				if(beta < -90 || beta >= 90){
+					alpha -= 180;
+				}else{
+					gamma = 180 + gamma;
+				}				
+			}
+
+			function animate(t){
+				camera.rotation.set(
+					THREE.Math.degToRad(gamma),
+					THREE.Math.degToRad(alpha),
+					THREE.Math.degToRad(0),
+					'YXZ'
+				);
+			}
+
+		</script>
+	</body>
+</html>
+
+
