@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Домашно 2</title>
+		<meta charset="utf-8">
+		
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+		<script src="three.min.js"></script>
+		<script src="physi.js"></script>
+		<script src="vax.js"></script>
+	</head>
+	
+	<body>
+		<script>
+			vaxInit();
+
+			const spotToIndex = {'upper_left' : 0,
+				'upper_middle' : 1,
+				'upper_right' : 2,
+				'middle_left' : 3,
+				'middle_middle' : 4,
+				'middle_right' : 5,
+				'down_left' : 6,
+				'down_middle' : 7,
+				'down_right' : 8
+			}
+
+			function placeSpotOnFrontSide(spots, die, dieSz, side){
+				const spotGeometry = new THREE.CircleGeometry(dieSz/10, 32);
+				const spotMaterial = Physijs.createMaterial(new THREE.MeshLambertMaterial({color: 'black'}));
+
+				const spotProt = new THREE.Mesh(spotGeometry, spotMaterial);
+
+				let t = dieSz / 3;
+
+				for(let i = 0; i < spots.length; i++){
+					const idx = spotToIndex[spots[i]];
+
+					const spot = spotProt.clone();
+					let y = Math.floor(idx /3) * t;
+					let x = (idx % 3) * t;
+					
+					x -= t;
+					y -= t;
+					
+					if(side == 'F'){
+						spot.position.set(x, y, dieSz/ 2 + 0.1);
+					}else if(side == 'U'){
+						spot.rotation.set(-Math.PI/2, 0, 0);
+						spot.position.set(x, dieSz / 2 + 0.1, y);
+					}else if(side == 'L'){
+						spot.rotation.set(0, -Math.PI/2, 0);
+						spot.position.set(-dieSz/ 2 - 0.1, x, y);
+					}else if(side == 'R'){
+						spot.rotation.set(0, Math.PI/2, 0);
+						spot.position.set(dieSz/ 2 + 0.1, x, y);
+					}else if(side == 'D'){
+						spot.rotation.set(Math.PI/2, 0, 0);
+						spot.position.set(x, -dieSz/ 2 - 0.1, y);
+					}else if(side == 'B'){
+						spot.rotation.set(Math.PI, 0, 0);
+						spot.position.set(x, y, -dieSz/ 2 - 0.1);
+					}
+
+					die.add(spot);
+				}
+			}
+
+			function createDie(dieSz){
+				const diceMaterial = Physijs.createMaterial(new THREE.MeshLambertMaterial({color: 'white'}));				
+				const diceGeometry = new THREE.BoxGeometry(dieSz, dieSz, dieSz);
+				const die = new Physijs.BoxMesh(diceGeometry, diceMaterial, 1);
+				placeSpotOnFrontSide(['middle_middle'], die, dieSz, 'F'); // 1
+				placeSpotOnFrontSide(['upper_left', 'down_left', 'middle_left', 'upper_right', 'down_right', 'middle_right'], die, dieSz, 'B'); //6
+				placeSpotOnFrontSide(['upper_left', 'middle_middle', 'down_right'], die, dieSz, 'R'); //3
+				placeSpotOnFrontSide(['upper_left', 'down_right'], die, dieSz, 'D'); //2
+				placeSpotOnFrontSide(['upper_left', 'down_left', 'middle_middle', 'upper_right', 'down_right'], die, dieSz, 'U'); //5
+				placeSpotOnFrontSide(['upper_left', 'down_left', 'upper_right', 'down_right'], die, dieSz, 'L'); //4
+
+				return die;
+			}
+
+			
+			function createBox(){
+				var boxSideGeometry = new THREE.BoxBufferGeometry(40, 40, 4);
+				var boxSideMaterial = Physijs.createMaterial(new THREE.MeshPhongMaterial({
+					color: "green",
+					opacity:0.2,
+					transparent : true,
+					side: THREE.DoubleSide
+				}));
+
+				var boxSide1 = new Physijs.BoxMesh(boxSideGeometry, boxSideMaterial, 0);
+
+				var boxSide2 = new Physijs.BoxMesh(boxSideGeometry, boxSideMaterial, 0);
+				var boxSide3 = new Physijs.BoxMesh(boxSideGeometry, boxSideMaterial, 0);
+				var boxSide4 = new Physijs.BoxMesh(boxSideGeometry, boxSideMaterial, 0);
+				
+				var geometry = new THREE.BoxGeometry( 300, 4, 300 ),
+				material = Physijs.createMaterial( new THREE.MeshPhongMaterial({color:0x62B9E9}) );
+
+				var ground = new Physijs.BoxMesh( geometry, material, 0 );
+				ground.position.set( 0, -20, 0 );
+				ground.receiveShadow = true;
+				scene.add( ground );
+				// var ground = new Phy
+				boxSide1.position.set(-2, 0, 20);
+				boxSide2.position.set(20, 0, 2);
+				boxSide3.position.set(-20, 0, -2);
+				boxSide4.position.set(2, 0, -20);
+				
+				boxSide2.rotation.set(0, Math.PI/2, 0);
+				boxSide3.rotation.set(0, Math.PI/2, 0);
+				
+				// var box = new THREE.Group();
+				// box.add(boxSide1, boxSide2, boxSide3, boxSide4);
+				// box.scale.set(2,2,2,2);
+
+				scene.add(boxSide1);
+				scene.add(boxSide2);
+				scene.add(boxSide3);
+				scene.add(boxSide4);
+
+				scene.add(ground);
+			}
+
+			camera.position.set( 80, 80, 40 );
+			camera.lookAt( new THREE.Vector3(0,0,0) );
+
+			var die = createDie(6);
+			var die2 = createDie(6);
+			die2.position.set(0, 30, 0);
+			die.position.set(-0, 42, -0);
+
+			scene.add(die);
+
+			scene.add(die2);
+
+			die.setLinearVelocity(new THREE.Vector3(THREE.Math.randFloat(-10, 14), -20, THREE.Math.randFloat(-10, 14)));
+
+			die2.setLinearVelocity(new THREE.Vector3(THREE.Math.randFloat(-10, 14), -10, THREE.Math.randFloat(-10, 12)));
+
+			die.setAngularVelocity(new THREE.Vector3(THREE.Math.randInt(2, 5), THREE.Math.randInt(3, 5), THREE.Math.randInt(5, 5)));
+			die2.setAngularVelocity(new THREE.Vector3(THREE.Math.randInt(2, 5), THREE.Math.randInt(5, 5), THREE.Math.randInt(4, 6)));
+			
+			
+			// const l = new THREE.PointLight( 0xff0000, 1, 100000 );
+			// l.position.set( 80, 80, 30 );
+			// scene.add( l );
+			// createBox();
+			
+			// светлина и сенки
+			// renderer.shadowMap.enabled = true;
+			// light.shadow.mapSize = new THREE.Vector2( 1024*2, 1024*2 );
+			// light.position.set( 0, 300, 0 );
+			// light.castShadow = true;
+
+
+			function animate(t)
+			{
+				scene.simulate(t/10);
+			}
+		</script>
+	</body>
+</html>
+
+

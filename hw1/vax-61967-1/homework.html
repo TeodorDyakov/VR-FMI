@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Homework 1</title>
+		<meta charset="utf-8">
+		
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+		<script src="three.min.js"></script>
+		<script src="stats.min.js"></script>
+		<script src="vax.js"></script>
+	</head>
+	
+	<body>
+		<script>
+			vaxInit();
+			
+			var material = new THREE.MeshPhongMaterial( {
+				color:0xcccccc,
+				shininess: 50
+			} );
+			var geometryA = new THREE.BoxGeometry( 28, 1, 10 );
+			var geometryB = new THREE.BoxGeometry(24, 1, 14);
+
+			var geometryC = new THREE.CylinderGeometry( 2, 2, 1, 32 );
+
+			var plate = new THREE.Group();
+			plate.scale.set( 1.5, 1.5, 1.5 );
+			scene.add( plate );
+			
+			var plateA = new THREE.Mesh( geometryA, material );
+			var plateB = new THREE.Mesh( geometryB, material );
+
+			var plateC = new THREE.Mesh( geometryC, material );
+			plateC.position.set( 12, 0, 5 );
+			var plateD = new THREE.Mesh( geometryC, material );
+			plateD.position.set( 12, 0, -5 );
+			var plateE = new THREE.Mesh( geometryC, material );
+			plateE.position.set( -12, 0, 5 );
+			var plateF = new THREE.Mesh( geometryC, material );
+			plateF.position.set( -12, 0, -5 );
+
+			var screenGeometry = new THREE.PlaneGeometry(22, 12);
+			var screenMaterial = new THREE.MeshPhongMaterial( {
+				color:'black',
+				shininess: 150
+			} );
+
+			var screen = new THREE.Mesh(screenGeometry, screenMaterial);
+			screen.rotation.x = -Math.PI/2;
+			screen.position.y = 0.51;
+
+			var cameraGeometry = new THREE.CircleGeometry(0.5, 30);
+			var cam = new THREE.Mesh(cameraGeometry, screenMaterial);
+			cam.position.y = 0.51;
+			cam.rotation.x = -Math.PI/2;
+			cam.position.x = 13;
+			cam.position.z = 5;
+
+			function createButton(buttonLength, buttonBorderRadius, material){
+				var button = new THREE.Group();
+				var geometryA = new THREE.BoxGeometry( buttonLength - 2 * buttonBorderRadius, buttonBorderRadius * 2); // правоъгълна форма
+				var box = new THREE.Mesh(geometryA, material);
+				var geometryB = new THREE.CylinderGeometry(buttonBorderRadius, buttonBorderRadius, 1, 32);
+				var edge = new THREE.Mesh(geometryB, material);
+				edge.rotation.x = Math.PI/2;
+				var edge2 = edge.clone();
+				edge.position.x = buttonLength/2 - buttonBorderRadius;
+				edge2.position.x = -buttonLength/2 + buttonBorderRadius;
+				button.add(box, edge, edge2);
+				console.log(button);
+				return button;
+			}
+			
+			var frontButton = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 32),
+			 new THREE.MeshLambertMaterial({color:"white"}));
+
+			frontButton.position.set(-12.5, 0.2, 0);	
+			
+			var button = createButton(3, 0.3, new THREE.MeshLambertMaterial({color:"gray", shininess:20}));
+			var button2 = createButton(2, 0.3, new THREE.MeshLambertMaterial({color:"gray", shininess:20}));
+			button.position.z = 6.8;
+			button.position.x = 10;
+			button2.position.z = 6.8;
+			button2.position.x = 4;
+
+			plate.add( plateA, plateB, plateC, plateD, plateE, plateF, screen, cam, button, button2, frontButton );
+			
+			var baseGeometry = new THREE.BoxGeometry(60, 5, 60);
+			var baseMaterial = new THREE.MeshPhongMaterial({color: 'pink'});
+			var base = new THREE.Mesh(baseGeometry, baseMaterial);
+			base.position.y = -20;
+			
+			var backCameraGeometry = new THREE.CylinderGeometry(1, 1, 0.3, 32);
+			var backCamera = new THREE.Mesh(backCameraGeometry, screenMaterial);
+			var backCamera2 = backCamera.clone();
+			var backCamera3 = backCamera.clone();
+			var backCamera4 = backCamera.clone();
+
+			backCamera.position.set(10, -0.7, 5);
+			backCamera2.position.set(10, -0.7, 2.5);
+			backCamera3.position.set(7.5, -0.7, 5);
+			backCamera4.position.set(7.5, -0.7, 2.5);
+
+            var chargerGeometry = new THREE.BoxGeometry(4,2,4);
+            var chargerMaterial = new THREE.MeshLambertMaterial({color:'black', shininess: 50});
+
+            var charger = new THREE.Mesh(chargerGeometry,chargerMaterial);
+
+            var chargerSecondGeometry = new THREE.BoxGeometry(3,1,3);
+            var chargerSecondMaterial = new THREE.MeshPhongMaterial({color:'black'});
+
+            var chargerSecond = new THREE.Mesh(chargerSecondGeometry,chargerSecondMaterial);
+            
+            chargerSecond.position.x = 3;
+
+			var chargerGroup = new THREE.Group();
+			chargerGroup.add(charger, chargerSecond);
+
+			plate.add(backCamera, backCamera2, backCamera3, backCamera4);
+            plate.add(chargerGroup);
+
+            var spikeGeometry = new THREE.CylinderGeometry(0.2,0.2,3,32);
+            var spikeMaterial = new THREE.MeshPhongMaterial({color:0xcccccc, shininess: 200});
+
+            var spike = new THREE.Mesh(spikeGeometry,spikeMaterial);
+            
+            spike.position.set(6,0,-1);
+            spike.rotation.set(0,0,Math.PI/2);
+
+            var spike2 = new THREE.Mesh(spikeGeometry,spikeMaterial);
+
+            spike2.position.set(6,0,1);
+            spike2.rotation.set(0,0,Math.PI/2);
+
+            chargerGroup.add(spike, spike2);
+			chargerGroup.position.set(0, 0, 20);
+
+			var cableGeom = new THREE.CylinderGeometry(0.3, 0.3,20, 32);
+			var cableMaterial = new THREE.MeshLambertMaterial({color:'black'});
+
+			var cable1 = new THREE.Mesh(cableGeom, cableMaterial);
+			cable1.rotation.set(0, 0, Math.PI/2);
+			cable1.position.set(-10, 0, 0);
+
+			var cable2 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3,14, 32),
+			cableMaterial );
+			cable2.rotation.set(0, 0, Math.PI/2);
+			cable2.position.set(-13, 0, -20);
+			
+			const curveGeometry = new THREE.TorusGeometry( 10, 0.3, 16, 100, Math.PI );
+
+			var cableCurve = new THREE.Mesh(curveGeometry, cableMaterial);
+			cableCurve.rotation.set(Math.PI/2, 0, Math.PI/2);
+			cableCurve.position.set(-20, 0, -10);
+			
+			
+			chargerGroup.add(cable1, cable2, cableCurve);
+		    
+			const l = new THREE.PointLight( 0xffffff, 1, 20 );
+			l.position.set( 0, 0, 20 );
+			scene.add( l );
+
+			function animate( t )
+			{
+				
+				plate.rotation.set( t/2, t/3, t/4 );
+			}
+
+
+		</script>
+	</body>
+</html>
+
+
