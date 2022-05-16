@@ -67,16 +67,16 @@
 
 			function deviceOrientation( event ){
 				alpha = event.alpha;
-				gamma = event.gamma - 90;
+				gamma = event.gamma + 90;
 				beta = event.beta;
 				
-				// gamma += 90;
+				gamma += 90;
 
-				// if(beta < -90 || beta >= 90){
-				// 	alpha += 180;
-				// }else{
-				// 	gamma = 180 - gamma;
-				// }				
+				if(beta < -90 || beta >= 90){
+					alpha += 180;
+				}else{
+					gamma = 180 - gamma;
+				}				
 			}
 
 			function animate(t){
