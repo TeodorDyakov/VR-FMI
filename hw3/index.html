@@ -1,98 +1,91 @@
 ﻿<!DOCTYPE html>
 
 <html>
-	<head>
-		<title>E0905: Ориентация на устройство</title>
-		<meta charset="utf-8">
-		
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <head>
+    <title>E0905: Ориентация на устройство</title>
+    <meta charset="utf-8" />
 
-		<script src="three.min.js"></script>
-        <script src="vax.js"></script>
-		
-	</head>
-	
-	<body>
-		
-		
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
 
-		<script>
-			
-			vaxInit();
+    <script src="three.min.js"></script>
+    <script src="vax.js"></script>
+	<script src="StereoEffect.js"></script>
+  </head>
 
-			var cubeGeometry = new THREE.BoxGeometry(50,50,50);
-			var cubeMaterial = new THREE.MeshLambertMaterial({"color" : 'violet'});
-			
-			const sz = 25;
+  <body>
+    <script>
+      vaxInitParallax();
 
-			var cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+      var cubeGeometry = new THREE.BoxGeometry(50, 50, 50);
+      var cubeMaterial = new THREE.MeshLambertMaterial({ color: "violet" });
 
-			// const l = new THREE.AmbientLight( 0x404040 ); // soft white light
-			// scene.add( l );
+      const sz = 25;
 
-			var l = new THREE.PointLight();
-			l.position.set( 0, 0, 10 );
-			scene.add(l);
+      var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
-			for(let i = 0; i < 200; i++){
-				var coneGeometry = new THREE.ConeGeometry(2, 5, 32	);
-				var coneMaterial = new THREE.MeshLambertMaterial({"color" : THREE.MathUtils.randInt(0, 0xffffff)});
+      // const l = new THREE.AmbientLight( 0x404040 ); // soft white light
+      // scene.add( l );
 
-				var cone = new THREE.Mesh(coneGeometry,coneMaterial);
+      var l = new THREE.PointLight();
+      l.position.set(0, 5, 10);
+      scene.add(l);
 
-				var rnd1 = THREE.MathUtils.randInt(-sz/2, sz/2) * 2;
-				var rnd2 = THREE.MathUtils.randInt(-sz/2, sz/2) * 2;
-				var rnd3 = THREE.MathUtils.randInt(-sz/2, sz/2) * 2;
+      for (let i = 0; i < 200; i++) {
+        var coneGeometry = new THREE.ConeGeometry(2, 5, 32);
+        var coneMaterial = new THREE.MeshLambertMaterial({
+          color: THREE.MathUtils.randInt(0, 0xffffff),
+        });
 
-				var idx = i % 3;
-				var sign = i % 2 == 1 ? 1 : -1;
-				cone.position.set(rnd1, rnd2, rnd3);				
-				cone.position.setComponent(idx, (sz -2)* sign);
+        var cone = new THREE.Mesh(coneGeometry, coneMaterial);
 
-				cube.add(cone);
-			}
+        var rnd1 = THREE.MathUtils.randInt(-sz / 2, sz / 2) * 2;
+        var rnd2 = THREE.MathUtils.randInt(-sz / 2, sz / 2) * 2;
+        var rnd3 = THREE.MathUtils.randInt(-sz / 2, sz / 2) * 2;
 
-			cube.material.side = THREE.DoubleSide;
+        var idx = i % 3;
+        var sign = i % 2 == 1 ? 1 : -1;
+        cone.position.set(rnd1, rnd2, rnd3);
+        cone.position.setComponent(idx, (sz - 2) * sign);
 
-			camera.position.set(0,0,0);
+        cube.add(cone);
+      }
 
-			scene.add(cube);
-			camera.add(light);
-			
-			window.addEventListener( "deviceorientation", deviceOrientation, true);
+      cube.material.side = THREE.DoubleSide;
 
-			var alpha = 0;
-			var gamma = 0;
-			var beta = 0;
+      camera.position.set(0, 0, 0);
 
-			function deviceOrientation( event ){
-				alpha = event.alpha;
-				gamma = event.gamma;
-				beta = event.beta;
-				
-				// if(gamma <= 0){
-				// 	beta = 0;
-				// 	// gamma = -90 - gamma;
-				// }else{
-				// 	beta = 180;
-				// 	// gamma = 90 - gamma;
-				// }				
-			}
+      scene.add(cube);
+      camera.add(light);
 
-			function animate(t){
-				alpha = THREE.Math.degToRad(alpha);
-				gamma = THREE.Math.degToRad(gamma);
-				beta = THREE.Math.degToRad(beta);
-				camera.rotation.set(
-					gamma,
-					alpha,
-					beta,
-					'YXZ'
-				);
-			}
+      window.addEventListener("deviceorientation", deviceOrientation, true);
 
-		</script>
-	</body>
+	  var alpha = 0;
+	  var beta = 0;
+	  var gamma = 0;
+
+      function deviceOrientation(event) {
+        alpha = event.alpha;
+        gamma = event.gamma;
+        beta = event.beta;
+        gamma += 90;
+		var absBeta = Math.abs(beta);
+        
+		if (absBeta >= 90) {
+			gamma += 180;
+        } else {
+		 	alpha -= 180;
+		}
+		alpha = THREE.Math.degToRad(alpha);
+        gamma = THREE.Math.degToRad(gamma);
+        camera.rotation.set(-gamma, alpha, 0, "YXZ");
+      }
+
+      function animate(t) {
+
+      }
+    </script>
+  </body>
 </html>
-
-
