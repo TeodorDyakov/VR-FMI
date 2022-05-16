@@ -70,12 +70,12 @@
 				gamma = event.gamma;
 				beta = event.beta;
 				
-				gamma += 90;
-
-				if(beta <= -90 || beta >= 90){
-					alpha -= 180;
+				if(gamma <= 0){
+					beta = 0;
+					gamma = -90 - gamma;
 				}else{
-					gamma += 180;
+					beta = 180;
+					gamma = 90 - gamma;
 				}				
 			}
 
@@ -85,7 +85,7 @@
 				camera.rotation.set(
 					gamma,
 					alpha,
-					THREE.Math.degToRad(0),
+					beta,
 					'YXZ'
 				);
 			}
