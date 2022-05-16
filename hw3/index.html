@@ -80,9 +80,11 @@
 			}
 
 			function animate(t){
+				alpha = THREE.Math.degToRad(alpha);
+				gamma = THREE.Math.degToRad(gamma);
 				camera.rotation.set(
-					THREE.Math.degToRad(-gamma),
-					THREE.Math.degToRad(-alpha),
+					gamma,
+					alpha,
 					THREE.Math.degToRad(0),
 					'YXZ'
 				);
