@@ -70,20 +70,20 @@
 				gamma = event.gamma;
 				beta = event.beta;
 				
-				// gamma += 90;
+				gamma += 90;
 
-				// if(beta <= -90 || beta >= 90){
-				// 	alpha -= 180;
-				// }else{
-				// 	gamma += 180;
-				// }				
+				if(beta <= -90 || beta >= 90){
+					alpha -= 180;
+				}else{
+					gamma += 180;
+				}				
 			}
 
 			function animate(t){
 				camera.rotation.set(
-					THREE.Math.degToRad(gamma),
-					THREE.Math.degToRad(alpha),
-					THREE.Math.degToRad(beta),
+					THREE.Math.degToRad(-gamma),
+					THREE.Math.degToRad(-alpha),
+					THREE.Math.degToRad(0),
 					'YXZ'
 				);
 			}
